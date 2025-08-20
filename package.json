@@ -1,0 +1,30 @@
+{
+  "name": "reverse-project-engineer",
+  "version": "1.0.0",
+  "description": "Reverse engineer existing codebases and sync with Jira for project management",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd app/backend && npm run dev",
+    "dev:frontend": "cd app/frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd app/backend && npm run build",
+    "build:frontend": "cd app/frontend && npm run build",
+    "start": "cd app/backend && npm run start",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd app/backend && npm run test",
+    "test:frontend": "cd app/frontend && npm run test",
+    "docker:up": "docker-compose -f infra/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f infra/docker-compose.yml down"
+  },
+  "keywords": [
+    "reverse-engineering",
+    "jira",
+    "project-management",
+    "code-analysis"
+  ],
+  "author": "Adam Dellow",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

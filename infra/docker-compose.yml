@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  # Backend API
+  backend:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - MONGO_URI=mongodb://mongo:27017/rpe
+      - REDIS_URL=redis://redis:6379
+      - APP_SECRET=your-super-secret-32-char-plus-key-here-for-dev
+      - ATLASSIAN_SITE=${ATLASSIAN_SITE}
+      - JIRA_EMAIL=${JIRA_EMAIL}
+      - JIRA_API_TOKEN=${JIRA_API_TOKEN}
+      - API_KEY=dev-api-key
+      - LOG_LEVEL=info
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - ../app/backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend
+  frontend:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ../app/frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  # MongoDB Database
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=rpe
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Job Queue Worker (optional, for background processing)
+  worker:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.backend
+    command: npm run queue:worker
+    environment:
+      - NODE_ENV=development
+      - MONGO_URI=mongodb://mongo:27017/rpe
+      - REDIS_URL=redis://redis:6379
+      - APP_SECRET=your-super-secret-32-char-plus-key-here-for-dev
+      - ATLASSIAN_SITE=${ATLASSIAN_SITE}
+      - JIRA_EMAIL=${JIRA_EMAIL}
+      - JIRA_API_TOKEN=${JIRA_API_TOKEN}
+      - LOG_LEVEL=info
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - ../app/backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
+  redis_data:
+
+networks:
+  default:
+    name: rpe-network

@@ -1,0 +1,39 @@
+{
+  "name": "rpe-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Reverse Project Engineer",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui"
+  },
+  "dependencies": {
+    "vue": "^3.3.8",
+    "vue-router": "^4.2.5",
+    "pinia": "^2.1.7",
+    "axios": "^1.6.2",
+    "tailwindcss": "^3.3.6",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "d3": "^7.8.5",
+    "cytoscape": "^3.26.0",
+    "vue-cytoscape": "^1.1.0",
+    "chart.js": "^4.4.0",
+    "vue-chartjs": "^5.2.0",
+    "date-fns": "^2.30.0",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.4.3",
+    "@types/lodash-es": "^4.17.12",
+    "@vitejs/plugin-vue": "^4.5.0",
+    "@vue/tsconfig": "^0.4.0",
+    "typescript": "^5.3.2",
+    "vite": "^5.0.0",
+    "vitest": "^0.34.6",
+    "vue-tsc": "^1.8.22"
+  }
+}
